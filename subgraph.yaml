@@ -1,0 +1,240 @@
+specVersion: 0.0.2
+
+description: Liquidity pools on Ethereum designed for efficient trading markerts
+repository: https://github.com/curvefi/curve-subgraph
+
+schema:
+  file: ./schema.graphql
+
+templates:
+  # Main pool contract
+  - name: Pool
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      abi: StableSwap
+    mapping: &pool_mapping
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      file: ./src/mappings/pool.ts
+      entities: [ ]
+      abis:
+        - name: StableSwap
+          file: ./abis/StableSwap.abi
+        - name: Registry
+          file: ./abis/Registry.abi
+      eventHandlers:
+        - event: AddLiquidity(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleAddLiquidity
+        - event: NewAdmin(indexed address)
+          handler: handleNewAdmin
+        - event: NewParameters(uint256,uint256,uint256)
+          handler: handleNewParameters
+        - event: NewFee(uint256,uint256)
+          handler: handleNewFee
+        - event: RampA(uint256,uint256,uint256,uint256)
+          handler: handleRampA
+        - event: StopRampA(uint256,uint256)
+          handler: handleStopRampA
+        - event: RemoveLiquidity(indexed address,uint256[2],uint256[2],uint256)
+          handler: handleRemoveLiquidity
+        - event: RemoveLiquidityImbalance(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleRemoveLiquidityImbalance
+        - event: RemoveLiquidityOne(indexed address,uint256,uint256)
+          handler: handleRemoveLiquidityOne
+        - event: TokenExchange(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: TokenExchangeUnderlying(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchangeUnderlying
+
+  # Measures the amount of liquidity provided by each user
+  - name: LiquidityGauge
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      abi: LiquidityGauge
+    mapping: &liquidity_gauge_mapping
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      file: ./src/mappings/dao/gauge.ts
+      entities: [ ]
+      abis:
+        - name: LiquidityGauge
+          file: ./abis/LiquidityGauge.abi
+      eventHandlers:
+        - event: Deposit(indexed address,uint256)
+          handler: handleDeposit
+        - event: UpdateLiquidityLimit(address,uint256,uint256,uint256,uint256)
+          handler: handleUpdateLiquidityLimit
+        - event: Withdraw(indexed address,uint256)
+          handler: handleWithdraw
+
+  # Custom version of Aragon Voting App
+  - name: Voting
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      abi: Voting
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      file: ./src/mappings/dao/voting.ts
+      entities: [ ]
+      abis:
+        - name: Voting
+          file: ./abis/Voting.abi
+      eventHandlers:
+        - event: MinimumBalanceSet(uint256)
+          handler: handleMinimumBalanceSet
+        - event: MinimumTimeSet(uint256)
+          handler: handleMinimumTimeSet
+        - event: ChangeMinQuorum(uint64)
+          handler: handleChangeMinQuorum
+        - event: ChangeSupportRequired(uint64)
+          handler: handleChangeSupportRequired
+        - event: StartVote(indexed uint256,indexed address,string,uint256,uint256,uint256,uint256)
+          handler: handleStartVote
+        - event: CastVote(indexed uint256,indexed address,bool,uint256)
+          handler: handleCastVote
+        - event: ExecuteVote(indexed uint256)
+          handler: handleExecuteVote
+
+dataSources:
+  # Address provider for registry contracts
+  - name: AddressProvider
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      abi: AddressProvider
+      address: '0x0000000022d53366457f9d5e68ec105046fc4383'
+      startBlock: 11153725
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      file: ./src/mappings/address-provider.ts
+      abis:
+        - name: AddressProvider
+          file: ./abis/AddressProvider.abi
+      entities:
+        - Contract
+        - SystemState
+      eventHandlers:
+        - event: AddressModified(indexed uint256,address,uint256)
+          handler: handleAddressModified
+        - event: NewAddressIdentifier(indexed uint256,address,string)
+          handler: handleNewAddressIdentifier
+
+  # Main registry contract used to locate pools and query information about them as well as registered coins.
+  - name: MainRegistry
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      abi: Registry
+      address: '0x7d86446ddb609ed0f5f8684acf30380a356b2b4c'
+      startBlock: 11154794
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      file: ./src/mappings/registry.ts
+      entities: [ ]
+      abis:
+        - name: ERC20
+          file: ./abis/ERC20.abi
+        - name: PoolInfo
+          file: ./abis/PoolInfo.abi
+        - name: Registry
+          file: ./abis/Registry.abi
+        - name: StableSwap
+          file: ./abis/StableSwap.abi
+      eventHandlers:
+        - event: PoolAdded(indexed address,bytes)
+          handler: handlePoolAdded
+        - event: PoolRemoved(indexed address)
+          handler: handlePoolRemoved
+
+  # Contract used to deploy new metapools. It also acts a registry for finding the deployed pools and querying information about them.
+  - name: MetapoolFactory
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      abi: Factory
+      address: '0x0959158b6040d32d04c301a72cbfd6b39e21c9ae'
+      startBlock: 11942404
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      file: ./src/mappings/factory.ts
+      abis:
+        - name: Factory
+          file: ./abis/Factory.abi
+      entities:
+        - Pool
+      eventHandlers:
+        - event: MetaPoolDeployed(address,address,uint256,uint256,address)
+          handler: handleMetaPoolDeployed
+
+  # Controls liquidity gauges and the issuance of CRV through the liquidity gauges
+  - name: GaugeController
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      abi: GaugeController
+      address: '0x2f50d538606fa9edd2b11e2446beb18c9d5846bb'
+      startBlock: 10647875
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      file: ./src/mappings/dao/gauge-controller.ts
+      abis:
+        - name: GaugeController
+          file: ./abis/GaugeController.abi
+        - name: LiquidityGauge
+          file: ./abis/LiquidityGauge.abi
+        - name: ERC20
+          file: ./abis/ERC20.abi
+      entities:
+        - Gauge
+        - GaugeType
+        - GaugeWeight
+        - GaugeWeightVote
+        - SystemState
+      eventHandlers:
+        - event: AddType(string,int128)
+          handler: handleAddType
+        - event: NewGauge(address,int128,uint256)
+          handler: handleNewGauge
+        - event: NewGaugeWeight(address,uint256,uint256,uint256)
+          handler: handleNewGaugeWeight
+        - event: NewTypeWeight(int128,uint256,uint256,uint256)
+          handler: handleNewTypeWeight
+        - event: VoteForGauge(uint256,address,address,uint256)
+          handler: handleVoteForGauge
+
+  # Aragon DAO instance (dao.curvefi.eth)
+  - name: DAO
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      abi: Kernel
+      address: '0xad06868167bc5ac5cfcbef2cafa82bc76961d72d'
+      startBlock: 10647740
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      file: ./src/mappings/dao/kernel.ts
+      abis:
+        - name: Kernel
+          file: ./abis/Kernel.abi
+      entities:
+        - Proposal
+      eventHandlers:
+        - event: NewAppProxy(address,bool,bytes32)
+          handler: handleNewProxyApp

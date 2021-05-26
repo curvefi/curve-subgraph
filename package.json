@@ -1,0 +1,17 @@
+{
+  "name": "curve-subgraph",
+  "version": "0.1.0",
+  "private": true,
+  "author": "Sebastián Galiano <sgaliano@gmail.com>",
+  "scripts": {
+    "auth": "graph auth https://api.thegraph.com/deploy/",
+    "build": "graph build",
+    "codegen": "graph codegen",
+    "deploy": "graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ curvefi/curve"
+  },
+  "dependencies": {
+    "@graphprotocol/graph-cli": "0.20.0",
+    "@graphprotocol/graph-ts": "0.20.0",
+    "@protofire/subgraph-toolkit": "0.1.2"
+  }
+}

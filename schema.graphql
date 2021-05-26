@@ -1,0 +1,566 @@
+type SystemState @entity {
+  " Singleton ID, equals to 'current' "
+  id: ID!
+
+  " Number of contracts in the AddressProvider registry "
+  contractCount: BigInt!
+
+  exchangeCount: BigInt!
+
+  " Number of gauges registered "
+  gaugeCount: BigInt!
+
+  " Number of gauge types registered "
+  gaugeTypeCount: BigInt!
+
+  " Number of active pools "
+  poolCount: BigInt!
+
+  " Number of tokens registered "
+  tokenCount: BigInt!
+
+  " Total number of pools (including removed ones) "
+  totalPoolCount: BigInt!
+
+  updated: BigInt!
+  updatedAtBlock: BigInt!
+  updatedAtTransaction: Bytes!
+}
+
+type Account @entity {
+  id: ID!
+
+  address: Bytes!
+
+  " Liquidity gauges this account contributed to "
+  gauges: [GaugeLiquidity!] @derivedFrom(field: "user")
+
+  "  "
+  gaugeWeightVotes: [GaugeWeightVote!] @derivedFrom(field: "user")
+
+  " Proposal created by this account "
+  proposals: [Proposal!] @derivedFrom(field: "creator")
+
+  "  "
+  proposalVotes: [ProposalVote!] @derivedFrom(field: "voter")
+}
+
+type Contract @entity {
+  id: ID!
+  address: Bytes!
+  description: String
+  isUpgradeable: Boolean
+  version: BigInt
+
+  added: BigInt!
+  addedAtBlock: BigInt!
+  addedAtTransaction: Bytes!
+
+  modified: BigInt!
+  modifiedAtBlock: BigInt!
+  modifiedAtTransaction: Bytes!
+
+  disabled: BigInt
+  disabledAtBlock: BigInt
+  disabledAtTransaction: Bytes
+}
+
+type Gauge @entity {
+  id: ID!
+  address: Bytes!
+  type: GaugeType!
+  pool: Pool
+
+  created: BigInt!
+  createdAtBlock: BigInt!
+  createdAtTransaction: Bytes!
+
+  weights: [GaugeWeight!] @derivedFrom(field: "gauge")
+
+  weightVotes: [GaugeWeightVote!] @derivedFrom(field: "gauge")
+}
+
+type GaugeWeight @entity {
+  id: ID!
+  gauge: Gauge!
+  time: BigInt!
+  weight: BigDecimal!
+}
+
+type GaugeWeightVote @entity {
+  id: ID!
+  gauge: Gauge!
+  user: Account!
+  time: BigInt!
+  weight: BigDecimal!
+}
+
+type GaugeType @entity {
+  id: ID!
+  name: String!
+  weights: [GaugeTypeWeight!] @derivedFrom(field: "type")
+}
+
+type GaugeTypeWeight @entity {
+  id: ID!
+  type: GaugeType!
+  time: BigInt!
+  weight: BigDecimal!
+}
+
+type GaugeTotalWeight @entity {
+  id: ID!
+  time: BigInt!
+  weight: BigDecimal!
+}
+
+type GaugeLiquidity @entity {
+  id: ID!
+  user: Account!
+  gauge: Gauge!
+  originalBalance: BigInt!
+  originalSupply: BigInt!
+  workingBalance: BigInt!
+  workingSupply: BigInt!
+  timestamp: BigInt!
+  block: BigInt!
+  transaction: Bytes!
+}
+
+type GaugeDeposit @entity {
+  id: ID!
+  gauge: Gauge!
+  provider: Account!
+  value: BigDecimal!
+}
+
+type GaugeWithdraw @entity {
+  id: ID!
+  gauge: Gauge!
+  provider: Account!
+  value: BigDecimal!
+}
+
+type LpToken @entity {
+  id: ID!
+  address: Bytes!
+  decimals: BigInt!
+  name: String
+  symbol: String
+  gauge: Gauge
+  pool: Pool
+}
+
+enum AssetType {
+  ETH
+  BTC
+  USD
+  EUR
+  LINK
+}
+
+type Pool @entity {
+  " Pool address "
+  id: ID!
+
+  " Pool's human-readable name "
+  name: String!
+
+  "  "
+  assetType: AssetType
+
+  " Registry contract address from where this pool was registered "
+  registryAddress: Bytes!
+
+  " Swap contract address "
+  swapAddress: Bytes!
+
+  " Address of the token representing LP share "
+  lpToken: LpToken!
+
+  " Number of coins composing the pool "
+  coinCount: BigInt!
+
+  " List of the swappable coins within the pool "
+  coins: [Coin!] @derivedFrom(field: "pool")
+
+  " Number of underlying coins composing the pool "
+  underlyingCount: BigInt!
+
+  " List of the swappable underlying coins within the pool "
+  underlyingCoins: [UnderlyingCoin!] @derivedFrom(field: "pool")
+
+  " Amplification coefficient multiplied by n * (n - 1) "
+  A: BigInt!
+
+  " Fee to charge for exchanges "
+  fee: BigDecimal!
+
+  " Admin fee is represented as a percentage of the total fee collected on a swap "
+  adminFee: BigDecimal!
+
+  " Admin address "
+  owner: Bytes
+
+  " Average dollar value of pool token "
+  virtualPrice: BigDecimal!
+
+  locked: BigDecimal!
+
+  addedAt: BigInt!
+  addedAtBlock: BigInt!
+  addedAtTransaction: Bytes!
+
+  removedAt: BigInt
+  removedAtBlock: BigInt
+  removedAtTransaction: Bytes
+
+  events: [PoolEvent!] @derivedFrom(field: "pool")
+
+  exchangeCount: BigInt!
+
+  exchanges: [Exchange!] @derivedFrom(field: "pool")
+
+  gaugeCount: BigInt!
+
+  " List of gauge contracts associated with the pool "
+  gauges: [Gauge!] @derivedFrom(field: "pool")
+
+  " Cumulative hourly trade volume "
+  hourlyVolumes: [HourlyVolume!] @derivedFrom(field: "pool")
+
+  " Cumulative daily trade volume "
+  dailyVolumes: [DailyVolume!] @derivedFrom(field: "pool")
+
+  " Cumulative weekly trade volume "
+  weeklyVolumes: [WeeklyVolume!] @derivedFrom(field: "pool")
+}
+
+type Coin @entity {
+  " Equals to: <pool_id>-<coin_index>"
+  id: ID!
+
+  " Coin index "
+  index: Int!
+
+  pool: Pool!
+
+  token: Token!
+
+  underlying: UnderlyingCoin!
+
+  balance: BigDecimal!
+
+  updated: BigInt!
+  updatedAtBlock: BigInt!
+  updatedAtTransaction: Bytes!
+}
+
+type UnderlyingCoin @entity {
+  " Equals to: <pool_id>-<coin_index>"
+  id: ID!
+
+  " Coin index "
+  index: Int!
+
+  pool: Pool!
+
+  token: Token!
+
+  coin: Coin!
+
+  balance: BigDecimal!
+
+  " Exchange rates between coins and underlying coins within the pool "
+  rate: BigDecimal!
+
+  updated: BigInt!
+  updatedAtBlock: BigInt!
+  updatedAtTransaction: Bytes!
+}
+
+type Token @entity {
+  id: ID!
+  address: Bytes!
+  decimals: BigInt!
+  name: String
+  symbol: String
+
+  pools: [Pool!]
+
+  coins: [Coin!] @derivedFrom(field: "token")
+ 
+  underlyingCoins: [UnderlyingCoin!] @derivedFrom(field: "token")
+}
+
+interface TradeVolume @entity {
+  pool: Pool!
+  timestamp: BigInt!
+  volume: BigDecimal!
+}
+
+type DailyVolume implements TradeVolume @entity {
+  id: ID!
+  pool: Pool!
+  timestamp: BigInt!
+  volume: BigDecimal!
+}
+
+type HourlyVolume implements TradeVolume @entity {
+  id: ID!
+  pool: Pool!
+  timestamp: BigInt!
+  volume: BigDecimal!
+}
+
+type WeeklyVolume implements TradeVolume @entity {
+  id: ID!
+  pool: Pool!
+  timestamp: BigInt!
+  volume: BigDecimal!
+}
+
+interface PoolEvent @entity {
+  pool: Pool!
+
+  block: BigInt!
+  timestamp: BigInt!
+  transaction: Bytes!
+}
+
+type AdminFeeChangelog implements PoolEvent @entity {
+  id: ID!
+  pool: Pool!
+  value: BigDecimal!
+
+  block: BigInt!
+  timestamp: BigInt!
+  transaction: Bytes!
+}
+
+type AmplificationCoeffChangelog implements PoolEvent @entity {
+  id: ID!
+  pool: Pool!
+  value: BigInt!
+
+  block: BigInt!
+  timestamp: BigInt!
+  transaction: Bytes!
+}
+
+type FeeChangelog implements PoolEvent @entity {
+  id: ID!
+  pool: Pool!
+  value: BigDecimal!
+
+  block: BigInt!
+  timestamp: BigInt!
+  transaction: Bytes!
+}
+
+type TransferOwnershipEvent implements PoolEvent @entity {
+  id: ID!
+  pool: Pool!
+  newAdmin: Bytes!
+
+  block: BigInt!
+  timestamp: BigInt!
+  transaction: Bytes!
+}
+
+type AddLiquidityEvent implements PoolEvent @entity {
+  id: ID!
+  pool: Pool!
+  provider: Account!
+  tokenAmounts: [BigInt!]!
+  fees: [BigInt!]!
+  invariant: BigInt!
+  tokenSupply: BigInt!
+
+  block: BigInt!
+  timestamp: BigInt!
+  transaction: Bytes!
+}
+
+type RemoveLiquidityEvent implements PoolEvent @entity {
+  id: ID!
+  pool: Pool!
+  provider: Account!
+  tokenAmounts: [BigInt!]!
+  fees: [BigInt!]
+  tokenSupply: BigInt
+  invariant: BigInt
+
+  block: BigInt!
+  timestamp: BigInt!
+  transaction: Bytes!
+}
+
+type RemoveLiquidityOneEvent implements PoolEvent @entity {
+  id: ID!
+  pool: Pool!
+  provider: Account!
+  tokenAmount: BigInt!
+  coinAmount: BigInt!
+
+  block: BigInt!
+  timestamp: BigInt!
+  transaction: Bytes!
+}
+
+type Exchange implements PoolEvent @entity {
+  id: ID!
+  pool: Pool!
+  buyer: Account!
+  receiver: Account!
+  tokenSold: Token!
+  tokenBought: Token!
+  amountSold: BigDecimal!
+  amountBought: BigDecimal!
+
+  block: BigInt!
+  timestamp: BigInt!
+  transaction: Bytes!
+}
+
+#
+# Governance
+#
+
+type VotingApp @entity {
+  " Equals to app address "
+  id: ID!
+
+  " Voting app instance "
+  address: Bytes!
+
+  " App codename "
+  codename: String!
+
+  " Minimum balance needed to create a proposal "
+  minimumBalance: BigDecimal!
+
+  " Percentage of positive votes in total possible votes for a proposal to be accepted "
+  minimumQuorum: BigDecimal!
+
+  " Minimum time needed to pass between user's previous proposal and a user creating a new proposal "
+  minimumTime: BigInt!
+
+  " Percentage of positive votes needed for a proposal to be accepted "
+  requiredSupport: BigDecimal!
+
+  " Seconds that a proposal will be open for vote (unless enough votes have been cast to make an early decision) "
+  voteTime: BigInt!
+
+  " Number of proposals created with this app "
+  proposalCount: BigInt!
+
+  " Number of votes received by all the proposals created with this app "
+  voteCount: BigInt!
+
+  " Address of the token used for voting "
+  token: Bytes!
+
+  " Proposals created through this app instance "
+  proposals: [Proposal!] @derivedFrom(field: "app")
+}
+
+type Proposal @entity {
+  id: ID!
+
+  " Sequential number in related to the realted voting app "
+  number: BigInt!
+
+  " Voting app instance "
+  app: VotingApp!
+
+  " Proposal creator's account "
+  creator: Account!
+
+  "  "
+  executionScript: Bytes!
+
+  "  "
+  expireDate: BigInt!
+
+  " Percentage of positive votes in total possible votes for this proposal to be accepted "
+  minimumQuorum: BigDecimal!
+
+  " Percentage of positive votes needed for this proposal to be accepted "
+  requiredSupport: BigDecimal!
+
+  "  "
+  snapshotBlock: BigInt!
+
+  "  "
+  votingPower: BigDecimal!
+
+  " Link to metadata file "
+  metadata: String
+
+  " Proposal description text "
+  text: String
+
+  " Number of votes received by the proposal "
+  voteCount: BigInt!
+
+  " Number of positive votes (yes) received by the proposal "
+  positiveVoteCount: BigInt!
+
+  " Number of negative votes (no) received by the proposal "
+  negativeVoteCount: BigInt!
+
+  "  "
+  currentQuorum: BigDecimal!
+
+  "  "
+  currentSupport: BigDecimal!
+
+  "  "
+  stakedSupport: BigDecimal!
+
+  "  "
+  totalStaked: BigDecimal!
+
+  "  "
+  created: BigInt!
+
+  "  "
+  createdAtBlock: BigInt!
+
+  "  "
+  createdAtTransaction: Bytes!
+
+  "  "
+  updated: BigInt
+
+  "  "
+  updatedAtBlock: BigInt
+
+  "  "
+  updatedAtTransaction: Bytes
+
+  "  "
+  executed: BigInt
+
+  "  "
+  executedAtBlock: BigInt
+
+  "  "
+  executedAtTransaction: Bytes
+
+  "  "
+  votes: [ProposalVote!] @derivedFrom(field: "proposal")
+}
+
+type ProposalVote @entity {
+  id: ID!
+  proposal: Proposal!
+  supports: Boolean!
+  stake: BigDecimal!
+  voter: Account!
+
+  created: BigInt!
+  createdAtBlock: BigInt!
+  createdAtTransaction: Bytes!
+}
