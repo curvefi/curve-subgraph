@@ -16,6 +16,7 @@ export function saveCoins(pool: Pool, event: ethereum.Event): void {
 
   if (coins) {
     let balances = getOrNull<BigInt[]>(registryContract.try_get_balances(poolContract._address))
+    let rates = getOrNull<BigInt[]>(registryContract.try_get_rates(poolContract._address))
 
     for (let i = 0, count = pool.coinCount.toI32(); i < count; ++i) {
       let token = getOrCreateToken(coins![i], event)
@@ -26,6 +27,7 @@ export function saveCoins(pool: Pool, event: ethereum.Event): void {
       coin.token = token.id
       coin.underlying = coin.id
       coin.balance = balances ? decimal.fromBigInt(balances![i], token.decimals.toI32()) : decimal.ZERO
+      coin.rate = rates ? decimal.fromBigInt(rates![i]) : decimal.ONE
       coin.updated = event.block.timestamp
       coin.updatedAtBlock = event.block.number
       coin.updatedAtTransaction = event.transaction.hash
@@ -35,7 +37,6 @@ export function saveCoins(pool: Pool, event: ethereum.Event): void {
 
   if (underlyingCoins) {
     let balances = getOrNull<BigInt[]>(registryContract.try_get_underlying_balances(poolContract._address))
-    let rates = getOrNull<BigInt[]>(registryContract.try_get_rates(poolContract._address))
 
     for (let i = 0, count = pool.underlyingCount.toI32(); i < count; ++i) {
       let token = getOrCreateToken(underlyingCoins![i], event)
@@ -45,8 +46,7 @@ export function saveCoins(pool: Pool, event: ethereum.Event): void {
       coin.pool = pool.id
       coin.token = token.id
       coin.coin = coin.id
-      coin.balance = balances ? decimal.fromBigInt(balances![i], token.decimals.toI32()) : decimal.ZERO
-      coin.rate = rates ? decimal.fromBigInt(rates![i]) : decimal.ONE
+      coin.balance = balances ? decimal.fromBigInt(balances![i]) : decimal.ZERO
       coin.updated = event.block.timestamp
       coin.updatedAtBlock = event.block.number
       coin.updatedAtTransaction = event.transaction.hash

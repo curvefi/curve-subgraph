@@ -142,9 +142,11 @@ export function handleTokenExchange(event: TokenExchange): void {
 
     let coinSold = Coin.load(pool.id + '-' + event.params.sold_id.toString())!
     let tokenSold = Token.load(coinSold.token)!
+    let amountSold = decimal.fromBigInt(event.params.tokens_sold, tokenSold.decimals.toI32())
 
     let coinBought = Coin.load(pool.id + '-' + event.params.bought_id.toString())!
     let tokenBought = Token.load(coinBought.token)!
+    let amountBought = decimal.fromBigInt(event.params.tokens_bought, tokenBought.decimals.toI32())
 
     let buyer = getOrRegisterAccount(event.params.buyer)
 
@@ -155,8 +157,8 @@ export function handleTokenExchange(event: TokenExchange): void {
     exchange.receiver = buyer.id
     exchange.tokenSold = tokenSold.id
     exchange.tokenBought = tokenBought.id
-    exchange.amountSold = decimal.fromBigInt(event.params.tokens_sold, tokenSold.decimals.toI32())
-    exchange.amountBought = decimal.fromBigInt(event.params.tokens_bought, tokenBought.decimals.toI32())
+    exchange.amountSold = amountSold.times(coinSold.rate)
+    exchange.amountBought = amountBought.times(coinBought.rate)
     exchange.block = event.block.number
     exchange.timestamp = event.block.timestamp
     exchange.transaction = event.transaction.hash
@@ -192,11 +194,11 @@ export function handleTokenExchangeUnderlying(event: TokenExchangeUnderlying): v
 
     let coinSold = UnderlyingCoin.load(pool.id + '-' + event.params.sold_id.toString())!
     let tokenSold = Token.load(coinSold.token)!
-    let soldAmount = decimal.fromBigInt(event.params.tokens_sold, tokenSold.decimals.toI32())
+    let amountSold = decimal.fromBigInt(event.params.tokens_sold, tokenSold.decimals.toI32())
 
     let coinBought = UnderlyingCoin.load(pool.id + '-' + event.params.bought_id.toString())!
     let tokenBought = Token.load(coinBought.token)!
-    let boughtAmount = decimal.fromBigInt(event.params.tokens_bought, tokenBought.decimals.toI32())
+    let amountBought = decimal.fromBigInt(event.params.tokens_bought, tokenBought.decimals.toI32())
 
     let buyer = getOrRegisterAccount(event.params.buyer)
 
@@ -207,8 +209,8 @@ export function handleTokenExchangeUnderlying(event: TokenExchangeUnderlying): v
     exchange.receiver = buyer.id
     exchange.tokenSold = tokenSold.id
     exchange.tokenBought = tokenBought.id
-    exchange.amountSold = soldAmount.times(coinSold.rate)
-    exchange.amountBought = boughtAmount.times(coinBought.rate)
+    exchange.amountSold = amountSold
+    exchange.amountBought = amountBought
     exchange.block = event.block.number
     exchange.timestamp = event.block.timestamp
     exchange.transaction = event.transaction.hash

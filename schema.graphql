@@ -251,6 +251,9 @@ type Coin @entity {
 
   balance: BigDecimal!
 
+  " Exchange rate between this coin and the associated underlying coin within the pool "
+  rate: BigDecimal!
+
   updated: BigInt!
   updatedAtBlock: BigInt!
   updatedAtTransaction: Bytes!
@@ -271,9 +274,6 @@ type UnderlyingCoin @entity {
 
   balance: BigDecimal!
 
-  " Exchange rates between coins and underlying coins within the pool "
-  rate: BigDecimal!
-
   updated: BigInt!
   updatedAtBlock: BigInt!
   updatedAtTransaction: Bytes!
@@ -289,7 +289,7 @@ type Token @entity {
   pools: [Pool!]
 
   coins: [Coin!] @derivedFrom(field: "token")
- 
+
   underlyingCoins: [UnderlyingCoin!] @derivedFrom(field: "token")
 }
 
