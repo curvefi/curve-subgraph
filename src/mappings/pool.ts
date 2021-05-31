@@ -167,18 +167,15 @@ export function handleTokenExchange(event: TokenExchange): void {
     // Save trade volume
     let volume = exchange.amountSold.plus(exchange.amountBought).div(decimal.TWO)
 
-    let hourlyVolume = getHourlyTradeVolume(event.block.timestamp)
-    hourlyVolume.pool = pool.id
+    let hourlyVolume = getHourlyTradeVolume(pool!, event.block.timestamp)
     hourlyVolume.volume = hourlyVolume.volume.plus(volume)
     hourlyVolume.save()
 
-    let dailyVolume = getDailyTradeVolume(event.block.timestamp)
-    dailyVolume.pool = pool.id
+    let dailyVolume = getDailyTradeVolume(pool!, event.block.timestamp)
     dailyVolume.volume = dailyVolume.volume.plus(volume)
     dailyVolume.save()
 
-    let weeklyVolume = getWeeklyTradeVolume(event.block.timestamp)
-    weeklyVolume.pool = pool.id
+    let weeklyVolume = getWeeklyTradeVolume(pool!, event.block.timestamp)
     weeklyVolume.volume = weeklyVolume.volume.plus(volume)
     weeklyVolume.save()
 
@@ -219,18 +216,15 @@ export function handleTokenExchangeUnderlying(event: TokenExchangeUnderlying): v
     // Save trade volume
     let volume = exchange.amountSold.plus(exchange.amountBought).div(decimal.TWO)
 
-    let hourlyVolume = getHourlyTradeVolume(event.block.timestamp)
-    hourlyVolume.pool = pool.id
+    let hourlyVolume = getHourlyTradeVolume(pool!, event.block.timestamp)
     hourlyVolume.volume = hourlyVolume.volume.plus(volume)
     hourlyVolume.save()
 
-    let dailyVolume = getDailyTradeVolume(event.block.timestamp)
-    dailyVolume.pool = pool.id
+    let dailyVolume = getDailyTradeVolume(pool!, event.block.timestamp)
     dailyVolume.volume = dailyVolume.volume.plus(volume)
     dailyVolume.save()
 
-    let weeklyVolume = getWeeklyTradeVolume(event.block.timestamp)
-    weeklyVolume.pool = pool.id
+    let weeklyVolume = getWeeklyTradeVolume(pool!, event.block.timestamp)
     weeklyVolume.volume = weeklyVolume.volume.plus(volume)
     weeklyVolume.save()
 
