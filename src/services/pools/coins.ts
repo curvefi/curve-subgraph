@@ -26,7 +26,7 @@ export function saveCoins(pool: Pool, event: ethereum.Event): void {
       coin.pool = pool.id
       coin.token = token.id
       coin.underlying = coin.id
-      coin.balance = balances ? decimal.fromBigInt(balances![i], token.decimals.toI32()) : decimal.ZERO
+      coin.balance = balances ? decimal.fromBigInt(balances![i], token.decimals) : decimal.ZERO
       coin.rate = rates ? decimal.fromBigInt(rates![i]) : decimal.ONE
       coin.updated = event.block.timestamp
       coin.updatedAtBlock = event.block.number

@@ -1,5 +1,5 @@
-import { Address, ethereum } from '@graphprotocol/graph-ts'
-import { decimal } from '@protofire/subgraph-toolkit'
+import { Address, BigDecimal, ethereum } from '@graphprotocol/graph-ts'
+import { decimal, integer } from '@protofire/subgraph-toolkit'
 
 import {
   AddLiquidity,
@@ -142,11 +142,11 @@ export function handleTokenExchange(event: TokenExchange): void {
 
     let coinSold = Coin.load(pool.id + '-' + event.params.sold_id.toString())!
     let tokenSold = Token.load(coinSold.token)!
-    let amountSold = decimal.fromBigInt(event.params.tokens_sold, tokenSold.decimals.toI32())
+    let amountSold = decimal.fromBigInt(event.params.tokens_sold, tokenSold.decimals)
 
     let coinBought = Coin.load(pool.id + '-' + event.params.bought_id.toString())!
     let tokenBought = Token.load(coinBought.token)!
-    let amountBought = decimal.fromBigInt(event.params.tokens_bought, tokenBought.decimals.toI32())
+    let amountBought = decimal.fromBigInt(event.params.tokens_bought, tokenBought.decimals)
 
     let buyer = getOrRegisterAccount(event.params.buyer)
 
@@ -165,7 +165,7 @@ export function handleTokenExchange(event: TokenExchange): void {
     exchange.save()
 
     // Save trade volume
-    let volume = exchange.amountSold.plus(exchange.amountBought).div(decimal.TWO)
+    let volume = (exchange.amountSold.plus(exchange.amountBought)).div(decimal.TWO)
 
     let hourlyVolume = getHourlyTradeVolume(pool!, event.block.timestamp)
     hourlyVolume.volume = hourlyVolume.volume.plus(volume)
@@ -191,11 +191,11 @@ export function handleTokenExchangeUnderlying(event: TokenExchangeUnderlying): v
 
     let coinSold = UnderlyingCoin.load(pool.id + '-' + event.params.sold_id.toString())!
     let tokenSold = Token.load(coinSold.token)!
-    let amountSold = decimal.fromBigInt(event.params.tokens_sold, tokenSold.decimals.toI32())
+    let amountSold = decimal.fromBigInt(event.params.tokens_sold, tokenSold.decimals)
 
     let coinBought = UnderlyingCoin.load(pool.id + '-' + event.params.bought_id.toString())!
     let tokenBought = Token.load(coinBought.token)!
-    let amountBought = decimal.fromBigInt(event.params.tokens_bought, tokenBought.decimals.toI32())
+    let amountBought = decimal.fromBigInt(event.params.tokens_bought, tokenBought.decimals)
 
     let buyer = getOrRegisterAccount(event.params.buyer)
 
@@ -214,7 +214,7 @@ export function handleTokenExchangeUnderlying(event: TokenExchangeUnderlying): v
     exchange.save()
 
     // Save trade volume
-    let volume = exchange.amountSold.plus(exchange.amountBought).div(decimal.TWO)
+    let volume = (exchange.amountSold.plus(exchange.amountBought)).div(decimal.TWO)
 
     let hourlyVolume = getHourlyTradeVolume(pool!, event.block.timestamp)
     hourlyVolume.volume = hourlyVolume.volume.plus(volume)

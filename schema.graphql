@@ -144,7 +144,7 @@ type GaugeWithdraw @entity {
 type LpToken @entity {
   id: ID!
   address: Bytes!
-  decimals: BigInt!
+  decimals: Int!
   name: String
   symbol: String
   gauge: Gauge
@@ -282,7 +282,7 @@ type UnderlyingCoin @entity {
 type Token @entity {
   id: ID!
   address: Bytes!
-  decimals: BigInt!
+  decimals: Int!
   name: String
   symbol: String
 

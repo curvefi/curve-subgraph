@@ -21,13 +21,13 @@ export function getOrCreateToken(address: Address, event: ethereum.Event): Token
     if (token.id == ETH_TOKEN_ADDRESS) {
       token.name = 'Ether'
       token.symbol = 'ETH'
-      token.decimals = BigInt.fromI32(18)
+      token.decimals = 18
     } else {
       let info = getTokenInfo(address)
 
       token.name = info.name
       token.symbol = info.symbol
-      token.decimals = BigInt.fromI32(info.decimals)
+      token.decimals = info.decimals
     }
 
     token.save()
@@ -51,7 +51,7 @@ export function getOrCreateLpToken(address: Address): LpToken {
     token.address = address
     token.name = info.name
     token.symbol = info.symbol
-    token.decimals = BigInt.fromI32(info.decimals)
+    token.decimals = info.decimals
 
     token.save()
   }
