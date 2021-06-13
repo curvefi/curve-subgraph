@@ -1,7 +1,7 @@
 specVersion: 0.0.2
 
-description: Liquidity pools on Ethereum designed for efficient trading markerts
-repository: https://github.com/curvefi/curve-subgraph
+description: Liquidity pools on Ethereum designed for efficient trading markets
+repository: https://github.com/token-terminal/curve-subgraph
 
 schema:
   file: ./schema.graphql
@@ -18,7 +18,7 @@ templates:
       apiVersion: 0.0.4
       language: wasm/assemblyscript
       file: ./src/mappings/pool.ts
-      entities: [ ]
+      entities: []
       abis:
         - name: StableSwap
           file: ./abis/StableSwap.abi
@@ -59,7 +59,7 @@ templates:
       apiVersion: 0.0.4
       language: wasm/assemblyscript
       file: ./src/mappings/dao/gauge.ts
-      entities: [ ]
+      entities: []
       abis:
         - name: LiquidityGauge
           file: ./abis/LiquidityGauge.abi
@@ -82,7 +82,7 @@ templates:
       apiVersion: 0.0.4
       language: wasm/assemblyscript
       file: ./src/mappings/dao/voting.ts
-      entities: [ ]
+      entities: []
       abis:
         - name: Voting
           file: ./abis/Voting.abi
@@ -141,7 +141,7 @@ dataSources:
       apiVersion: 0.0.4
       language: wasm/assemblyscript
       file: ./src/mappings/registry.ts
-      entities: [ ]
+      entities: []
       abis:
         - name: ERC20
           file: ./abis/ERC20.abi
