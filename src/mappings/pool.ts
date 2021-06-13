@@ -1,5 +1,5 @@
-import { Address, BigDecimal, ethereum } from '@graphprotocol/graph-ts'
-import { decimal, integer } from '@protofire/subgraph-toolkit'
+import { Address, ethereum } from '@graphprotocol/graph-ts'
+import { decimal } from '@protofire/subgraph-toolkit'
 
 import {
   AddLiquidity,
