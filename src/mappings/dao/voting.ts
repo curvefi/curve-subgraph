@@ -171,10 +171,7 @@ function getOrRegisterVotingApp(address: Bytes): VotingApp {
   if (app == null) {
     let votingContract = Voting.bind(address as Address)
 
-    let codename = dataSource
-      .context()
-      .get('type')!
-      .toString()
+    let codename = dataSource.context().get('type')!.toString()
 
     app = new VotingApp(address.toHexString())
     app.address = address

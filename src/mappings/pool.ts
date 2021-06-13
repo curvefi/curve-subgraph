@@ -165,7 +165,7 @@ export function handleTokenExchange(event: TokenExchange): void {
     exchange.save()
 
     // Save trade volume
-    let volume = (exchange.amountSold.plus(exchange.amountBought)).div(decimal.TWO)
+    let volume = exchange.amountSold.plus(exchange.amountBought).div(decimal.TWO)
 
     let hourlyVolume = getHourlyTradeVolume(pool!, event.block.timestamp)
     hourlyVolume.volume = hourlyVolume.volume.plus(volume)
@@ -214,7 +214,7 @@ export function handleTokenExchangeUnderlying(event: TokenExchangeUnderlying): v
     exchange.save()
 
     // Save trade volume
-    let volume = (exchange.amountSold.plus(exchange.amountBought)).div(decimal.TWO)
+    let volume = exchange.amountSold.plus(exchange.amountBought).div(decimal.TWO)
 
     let hourlyVolume = getHourlyTradeVolume(pool!, event.block.timestamp)
     hourlyVolume.volume = hourlyVolume.volume.plus(volume)
