@@ -1,7 +1,7 @@
 specVersion: 0.0.2
 
 description: Liquidity pools on Ethereum designed for efficient trading markets
-repository: https://github.com/token-terminal/curve-subgraph
+repository: https://github.com/curvefi/curve-subgraph
 
 schema:
   file: ./schema.graphql
