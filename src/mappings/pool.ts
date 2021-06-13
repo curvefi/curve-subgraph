@@ -140,11 +140,11 @@ export function handleTokenExchange(event: TokenExchange): void {
   if (pool != null) {
     pool = getPoolSnapshot(pool!, event)
 
-    let coinSold = Coin.load(pool.id + '-' + event.params.sold_id.toString())!
+    let coinSold = UnderlyingCoin.load(pool.id + '-' + event.params.sold_id.toString())!
     let tokenSold = Token.load(coinSold.token)!
     let amountSold = decimal.fromBigInt(event.params.tokens_sold, tokenSold.decimals)
 
-    let coinBought = Coin.load(pool.id + '-' + event.params.bought_id.toString())!
+    let coinBought = UnderlyingCoin.load(pool.id + '-' + event.params.bought_id.toString())!
     let tokenBought = Token.load(coinBought.token)!
     let amountBought = decimal.fromBigInt(event.params.tokens_bought, tokenBought.decimals)
 
@@ -157,8 +157,8 @@ export function handleTokenExchange(event: TokenExchange): void {
     exchange.receiver = buyer.id
     exchange.tokenSold = tokenSold.id
     exchange.tokenBought = tokenBought.id
-    exchange.amountSold = amountSold.times(coinSold.rate)
-    exchange.amountBought = amountBought.times(coinBought.rate)
+    exchange.amountSold = amountSold
+    exchange.amountBought = amountBought
     exchange.block = event.block.number
     exchange.timestamp = event.block.timestamp
     exchange.transaction = event.transaction.hash
