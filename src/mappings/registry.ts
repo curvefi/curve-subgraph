@@ -55,18 +55,34 @@ function getOrCreatePool(address: Address, event: ethereum.Event): Pool {
     pool.locked = decimal.ZERO
 
     // LP token
-    let lpToken = getOrCreateLpToken(registryContract.get_lp_token(address))
-    lpToken.pool = pool.id
-    lpToken.save()
+    let lpToken = registryContract.try_get_lp_token(address)
 
-    pool.lpToken = lpToken.id
+    if (!lpToken.reverted) {
+      let token = getOrCreateLpToken(lpToken.value)
+      token.pool = pool.id
+      token.save()
+
+      pool.lpToken = token.id
+
+
+      // Associate gauge to pool
+      if (token.gauge != null) {
+        let gauge = Gauge.load(token.gauge)!
+        gauge.pool = pool.id
+        gauge.save()
+
+        pool.gaugeCount = integer.increment(pool.gaugeCount)
+      }
+    }
 
     // Pool parameters
-    let params = registryContract.get_parameters(address)
+    let params = registryContract.try_get_parameters(address)
 
-    pool.A = params.value0
-    pool.fee = decimal.fromBigInt(params.value2, FEE_PRECISION)
-    pool.adminFee = decimal.fromBigInt(params.value3, FEE_PRECISION)
+    if (!params.reverted) {
+      pool.A = params.value.value0
+      pool.fee = decimal.fromBigInt(params.value.value2, FEE_PRECISION)
+      pool.adminFee = decimal.fromBigInt(params.value.value3, FEE_PRECISION)
+    }
 
     // Owner
     let owner = swapContract.try_owner()
@@ -100,11 +116,10 @@ function getOrCreatePool(address: Address, event: ethereum.Event): Pool {
     state.totalPoolCount = integer.increment(state.totalPoolCount)
     state.save()
 
-    // Start indexing pool's events
+    // Start indexing events from new pool
     let context = new DataSourceContext()
     context.setBytes('registry', registryContract._address)
 
-    // Start indexing events from new pool
     PoolDataSource.createWithContext(address, context)
   }
 

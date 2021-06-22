@@ -66,25 +66,29 @@ export function handleNewGauge(event: NewGauge): void {
 
   let nextWeek = nextPeriod(event.block.timestamp, WEEK)
 
+  let gaugeType = GaugeType.load(event.params.gauge_type.toString())!
+
   // Add gauge instance
   let gauge = new Gauge(event.params.addr.toHexString())
   gauge.address = event.params.addr
-  gauge.type = event.params.gauge_type.toString()
+  gauge.type = gaugeType.id
 
   gauge.created = event.block.timestamp
   gauge.createdAtBlock = event.block.number
   gauge.createdAtTransaction = event.transaction.hash
 
   // Associate gauge to a pool via the LP token
-  let lpToken = GaugeContract.bind(event.params.addr).lp_token()
+  let lpToken = GaugeContract.bind(event.params.addr).try_lp_token()
 
-  let token = getOrCreateLpToken(lpToken)
-  token.gauge = gauge.id
-  token.save()
+  if (!lpToken.reverted) {
+    let token = getOrCreateLpToken(lpToken.value)
+    token.gauge = gauge.id
+    token.save()
 
-  if (token.pool != null) {
-    let pool = Pool.load(token.pool)
-    gauge.pool = pool.id
+    if (token.pool != null) {
+      let pool = Pool.load(token.pool)!
+      gauge.pool = pool.id
+    }
   }
 
   gauge.save()

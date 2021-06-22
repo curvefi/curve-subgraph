@@ -1,5 +1,5 @@
 import { Address, ethereum } from '@graphprotocol/graph-ts'
-import { decimal } from '@protofire/subgraph-toolkit'
+import { decimal, integer } from '@protofire/subgraph-toolkit'
 
 import {
   AddLiquidity,
@@ -179,6 +179,7 @@ export function handleTokenExchange(event: TokenExchange): void {
     weeklyVolume.volume = weeklyVolume.volume.plus(volume)
     weeklyVolume.save()
 
+    pool.exchangeCount = integer.increment(pool.exchangeCount)
     pool.save()
   }
 }
@@ -228,6 +229,7 @@ export function handleTokenExchangeUnderlying(event: TokenExchangeUnderlying): v
     weeklyVolume.volume = weeklyVolume.volume.plus(volume)
     weeklyVolume.save()
 
+    pool.exchangeCount = integer.increment(pool.exchangeCount)
     pool.save()
   }
 }
@@ -266,7 +268,7 @@ export function handleNewFee(event: NewFee): void {
     // Save event logs
     let adminFeeLog = new AdminFeeChangelog('af-' + getEventId(event))
     adminFeeLog.pool = pool.id
-    adminFeeLog.value = pool.adminFee
+    adminFeeLog.value = pool.adminFee!
     adminFeeLog.block = event.block.number
     adminFeeLog.timestamp = event.block.timestamp
     adminFeeLog.transaction = event.transaction.hash
@@ -274,7 +276,7 @@ export function handleNewFee(event: NewFee): void {
 
     let feeLog = new FeeChangelog('f-' + getEventId(event))
     feeLog.pool = pool.id
-    feeLog.value = pool.fee
+    feeLog.value = pool.fee!
     feeLog.block = event.block.number
     feeLog.timestamp = event.block.timestamp
     feeLog.transaction = event.transaction.hash
@@ -298,23 +300,23 @@ export function handleNewParameters(event: NewParameters): void {
     // Save event logs
     let adminFeeLog = new AdminFeeChangelog('af-' + getEventId(event))
     adminFeeLog.pool = pool.id
-    adminFeeLog.value = pool.adminFee
+    adminFeeLog.value = pool.adminFee!
     adminFeeLog.block = event.block.number
     adminFeeLog.timestamp = event.block.timestamp
     adminFeeLog.transaction = event.transaction.hash
     adminFeeLog.save()
 
-    let aLog = new AmplificationCoeffChangelog('a-' + getEventId(event))
-    aLog.pool = pool.id
-    aLog.value = pool.A
-    aLog.block = event.block.number
-    aLog.timestamp = event.block.timestamp
-    aLog.transaction = event.transaction.hash
-    aLog.save()
+    let aCoeffLog = new AmplificationCoeffChangelog('a-' + getEventId(event))
+    aCoeffLog.pool = pool.id
+    aCoeffLog.value = pool.A!
+    aCoeffLog.block = event.block.number
+    aCoeffLog.timestamp = event.block.timestamp
+    aCoeffLog.transaction = event.transaction.hash
+    aCoeffLog.save()
 
     let feeLog = new FeeChangelog('f-' + getEventId(event))
     feeLog.pool = pool.id
-    feeLog.value = pool.fee
+    feeLog.value = pool.fee!
     feeLog.block = event.block.number
     feeLog.timestamp = event.block.timestamp
     feeLog.transaction = event.transaction.hash
@@ -336,7 +338,7 @@ export function handleRampA(event: RampA): void {
     // Save event log
     let log = new AmplificationCoeffChangelog('a-' + getEventId(event))
     log.pool = pool.id
-    log.value = pool.A
+    log.value = pool.A!
     log.block = event.block.number
     log.timestamp = event.block.timestamp
     log.transaction = event.transaction.hash
@@ -358,7 +360,7 @@ export function handleStopRampA(event: StopRampA): void {
     // Save event log
     let log = new AmplificationCoeffChangelog('a-' + getEventId(event))
     log.pool = pool.id
-    log.value = pool.A
+    log.value = pool.A!
     log.block = event.block.number
     log.timestamp = event.block.timestamp
     log.transaction = event.transaction.hash

@@ -98,6 +98,7 @@ type GaugeWeightVote @entity {
 type GaugeType @entity {
   id: ID!
   name: String!
+  gauges: [Gauge!] @derivedFrom(field: "type")
   weights: [GaugeTypeWeight!] @derivedFrom(field: "type")
 }
 
@@ -190,14 +191,18 @@ type Pool @entity {
   " List of the swappable underlying coins within the pool "
   underlyingCoins: [UnderlyingCoin!] @derivedFrom(field: "pool")
 
+  #
+  # Parameters
+  #
+
   " Amplification coefficient multiplied by n * (n - 1) "
-  A: BigInt!
+  A: BigInt
 
   " Fee to charge for exchanges "
-  fee: BigDecimal!
+  fee: BigDecimal
 
   " Admin fee is represented as a percentage of the total fee collected on a swap "
-  adminFee: BigDecimal!
+  adminFee: BigDecimal
 
   " Admin address "
   owner: Bytes
