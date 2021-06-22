@@ -2,10 +2,11 @@ type SystemState @entity {
   " Singleton ID, equals to 'current' "
   id: ID!
 
+  " Current pool registry address "
+  registryContract: Bytes
+
   " Number of contracts in the AddressProvider registry "
   contractCount: BigInt!
-
-  exchangeCount: BigInt!
 
   " Number of gauges registered "
   gaugeCount: BigInt!
@@ -47,10 +48,9 @@ type Account @entity {
 
 type Contract @entity {
   id: ID!
-  address: Bytes!
+
+  " Human-readable description "
   description: String
-  isUpgradeable: Boolean
-  version: BigInt
 
   added: BigInt!
   addedAtBlock: BigInt!
@@ -60,9 +60,18 @@ type Contract @entity {
   modifiedAtBlock: BigInt!
   modifiedAtTransaction: Bytes!
 
-  disabled: BigInt
-  disabledAtBlock: BigInt
-  disabledAtTransaction: Bytes
+  versions: [ContractVersion!] @derivedFrom(field: "contract")
+}
+
+type ContractVersion @entity {
+  id: ID!
+  contract: Contract!
+  address: Bytes!
+  version: BigInt!
+
+  added: BigInt!
+  addedAtBlock: BigInt!
+  addedAtTransaction: Bytes!
 }
 
 type Gauge @entity {

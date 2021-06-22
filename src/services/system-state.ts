@@ -9,7 +9,6 @@ export function getSystemState(event: ethereum.Event): SystemState {
   if (state == null) {
     state = new SystemState('current')
     state.contractCount = integer.ZERO
-    state.exchangeCount = integer.ZERO
     state.gaugeCount = integer.ZERO
     state.gaugeTypeCount = integer.ZERO
     state.poolCount = integer.ZERO

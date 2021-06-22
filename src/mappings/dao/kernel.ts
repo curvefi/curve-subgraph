@@ -1,9 +1,10 @@
 import { DataSourceContext, Value } from '@graphprotocol/graph-ts'
+import { integer } from '@protofire/subgraph-toolkit'
 
 import { NewAppProxy } from '../../../generated/DAO/Kernel'
 import { Voting } from '../../../generated/templates'
 
-import { Contract } from '../../../generated/schema'
+import { Contract, ContractVersion } from '../../../generated/schema'
 
 const VOTING_APP_ID = '0x2436adbbb3230545df6846695013211d36736f647c91b302b9591e5e2d013485'
 const VOTING_TYPE: string[] = ['Ownership', 'Parameter']
@@ -18,14 +19,22 @@ export function handleNewProxyApp(event: NewAppProxy): void {
       id = VOTING_TYPE[i] || 'crv-voting-' + i.toString()
     }
 
+    // Register contract
     let contract = new Contract(id)
-    contract.address = event.params.proxy
     contract.description = id.indexOf('crv-voting') == 0 ? id : id + ' Voting'
-    contract.isUpgradeable = event.params.isUpgradeable
     contract.added = contract.modified = event.block.timestamp
     contract.addedAtBlock = contract.modifiedAtBlock = event.block.number
     contract.addedAtTransaction = contract.modifiedAtTransaction = event.transaction.hash
     contract.save()
+
+    let contractVersion = new ContractVersion(contract.id + '-1')
+    contractVersion.contract = contract.id
+    contractVersion.address = event.params.proxy
+    contractVersion.version = integer.ONE
+    contractVersion.added = contract.modified = event.block.timestamp
+    contractVersion.addedAtBlock = contract.modifiedAtBlock = event.block.number
+    contractVersion.addedAtTransaction = contract.modifiedAtTransaction = event.transaction.hash
+    contractVersion.save()
 
     // Create dynamic data source
     let context = new DataSourceContext()

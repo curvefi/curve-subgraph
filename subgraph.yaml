@@ -121,6 +121,7 @@ dataSources:
           file: ./abis/AddressProvider.abi
       entities:
         - Contract
+        - ContractVersion
         - SystemState
       eventHandlers:
         - event: AddressModified(indexed uint256,address,uint256)
