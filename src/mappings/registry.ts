@@ -103,13 +103,6 @@ function getOrCreatePool(address: Address, event: ethereum.Event): Pool {
 
     pool.save()
 
-    // Associate gauge to pool
-    if (lpToken.gauge != null) {
-      let gauge = Gauge.load(lpToken.gauge)!
-      gauge.pool = pool.id
-      gauge.save()
-    }
-
     // Count pools
     let state = getSystemState(event)
     state.poolCount = integer.increment(state.poolCount)
