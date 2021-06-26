@@ -7,7 +7,10 @@
     "auth": "graph auth https://api.thegraph.com/deploy/",
     "build": "graph build",
     "codegen": "graph codegen",
-    "deploy": "graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ curvefi/curve"
+    "deploy": "graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ curvefi/curve-subgraph",
+    "create-local": "graph create --node http://localhost:8020/ pioul/curve-subgraph",
+    "remove-local": "graph remove --node http://localhost:8020/ pioul/curve-subgraph",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 pioul/curve-subgraph"
   },
   "dependencies": {
     "@graphprotocol/graph-cli": "0.20.0",
