@@ -40,6 +40,13 @@ poolNames.set('0x2dded6da1bf5dbdf597c45fcfaa3194e53ecfeaf', 'ib')
 poolNames.set('0xf178c0b5bb7e7abf4e12a4838c7b7c5ba2c623c0', 'link')
 poolNames.set('0x36965b1a6b97c1b33416e5d53fb5621ade1f1e80', 'usdp')
 poolNames.set('0x42d7025938bec20b69cbae5a77421082407f053a', 'usdp')
+poolNames.set('0xecd5e75afb02efa118af914515d6521aabd189f1', 'tusd')
+poolNames.set('0xd632f22692fac7611d2aa1c0d552930d43caed3b', 'frax')
+poolNames.set('0xed279fdd11ca84beef15af5d39bb4d4bee23f0ca', 'lusd')
+poolNames.set('0x4807862aa8b2bf68830e4c8dc86d0e9a998e085a', 'busdv2')
+poolNames.set('0xf9440930043eb3997fc70e1339dbb11f341de7a8', 'reth')
+poolNames.set('0x43b4fdfd4ff969587185cdb6f0bd875c5fc83f8c', 'alusd')
+poolNames.set('0x80466c64868e1ab14a1ddf27a676c3fcbe638fe5', 'tricrypto')
 
 export function getPoolName(id: string): string {
   return poolNames.isSet(id) ? (poolNames.get(id) as string) : id
