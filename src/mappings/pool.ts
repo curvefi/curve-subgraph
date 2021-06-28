@@ -157,8 +157,8 @@ export function handleTokenExchange(event: TokenExchange): void {
     exchange.receiver = buyer.id
     exchange.tokenSold = tokenSold.id
     exchange.tokenBought = tokenBought.id
-    exchange.amountSold = amountSold.times(coinSold.rate)
-    exchange.amountBought = amountBought.times(coinBought.rate)
+    exchange.amountSold = amountSold
+    exchange.amountBought = amountBought
     exchange.block = event.block.number
     exchange.timestamp = event.block.timestamp
     exchange.transaction = event.transaction.hash
