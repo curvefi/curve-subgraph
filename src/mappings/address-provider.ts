@@ -36,7 +36,7 @@ function registerContract(id: BigInt, event: ethereum.Event): Contract {
   contract.modifiedAtTransaction = event.transaction.hash
   contract.save()
 
-  let version = new ContractVersion(id.toString() + info.value2.toString())
+  let version = new ContractVersion(id.toString() + '-' + info.value2.toString())
   version.contract = contract.id
   version.address = info.value0
   version.version = info.value2
