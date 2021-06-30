@@ -165,6 +165,8 @@ enum AssetType {
   ETH
   BTC
   USD
+  OTHER
+  CRYPTO
   EUR
   LINK
 }
@@ -176,8 +178,11 @@ type Pool @entity {
   " Pool's human-readable name "
   name: String!
 
-  "  "
+  " Reference asset type "
   assetType: AssetType
+
+  " Identify whether pool is a metapool "
+  isMeta: Boolean!
 
   " Registry contract address from where this pool was registered "
   registryAddress: Bytes!

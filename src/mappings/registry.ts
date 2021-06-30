@@ -7,8 +7,6 @@ import { Pool as PoolDataSource } from '../../generated/templates'
 
 import { Gauge, Pool } from '../../generated/schema'
 
-import { getAssetType } from '../services/pools/asset-types' // TODO: replace when new pool registry deployed
-import { getPoolName } from '../services/pools/names' // TODO: replace when new pool registry deployed
 import { getSystemState } from '../services/system-state'
 import { getOrCreateLpToken } from '../services/tokens'
 
@@ -42,11 +40,38 @@ function getOrCreatePool(address: Address, event: ethereum.Event): Pool {
     pool.gaugeCount = integer.ZERO
     pool.underlyingCount = coinCount[1]
 
-    // Asset Type
-    pool.assetType = getAssetType(pool.id)
+    // Identify metapools
+    let metapool = registryContract.try_is_meta(address)
 
-    // Name
-    pool.name = getPoolName(pool.id)
+    pool.isMeta = !metapool.reverted && metapool.value
+
+    // Pool name
+    pool.name = registryContract.get_pool_name(address)
+
+    // Reference asset
+    let assetType = registryContract.try_get_pool_asset_type(address)
+
+    if (!assetType.reverted) {
+      let type = assetType.value.toString()
+
+      if (type == '0') {
+        pool.assetType = 'USD'
+      } else if (type == '1') {
+        pool.assetType = 'ETH'
+      } else if (type == '2') {
+        pool.assetType = 'BTC'
+      } else if (type == '3') {
+        if (pool.name == 'link') {
+          pool.assetType = 'LINK'
+        } else if (pool.name.startsWith('eur')) {
+          pool.assetType = 'EUR'
+        } else {
+          pool.assetType = 'OTHER'
+        }
+      } else if (type == '4') {
+        pool.assetType = 'CRYPTO'
+      }
+    }
 
     // Coin balances and underlying coin balances/rates
     saveCoins(pool!, event)
@@ -63,7 +88,6 @@ function getOrCreatePool(address: Address, event: ethereum.Event): Pool {
       token.save()
 
       pool.lpToken = token.id
-
 
       // Associate gauge to pool
       if (token.gauge != null) {

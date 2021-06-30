@@ -129,14 +129,14 @@ dataSources:
         - event: NewAddressIdentifier(indexed uint256,address,string)
           handler: handleNewAddressIdentifier
 
-  # Main registry contract used to locate pools and query information about them as well as registered coins.
+  # Main registry contract used to locate pools and query information about them as well as registered coins
   - name: MainRegistry
     kind: ethereum/contract
     network: mainnet
     source:
       abi: Registry
-      address: '0x7d86446ddb609ed0f5f8684acf30380a356b2b4c'
-      startBlock: 11154794
+      address: '0x90e00ace148ca3b23ac1bc8c240c2a7dd9c2d7f5'
+      startBlock: 12195750
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
