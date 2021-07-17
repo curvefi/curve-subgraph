@@ -1,4 +1,4 @@
-import { Address, Bytes, dataSource, ipfs, json, log } from '@graphprotocol/graph-ts'
+import { Address, Bytes, dataSource /*, ipfs, json, log*/ } from '@graphprotocol/graph-ts'
 import { decimal, integer } from '@protofire/subgraph-toolkit'
 
 import {
@@ -63,34 +63,35 @@ export function handleStartVote(event: StartVote): void {
   // Parse proposal metadata
   proposal.metadata = event.params.metadata
 
-  if (event.params.metadata.startsWith('ipfs:')) {
-    let hash = event.params.metadata.slice(5) // because string.replace() is not supported on current AS version
-    let content = ipfs.cat(hash)
-
-    if (content != null) {
-      let jsonFile = json.try_fromBytes(content as Bytes)
-
-      if (jsonFile.isOk) {
-        let value = jsonFile.value
-
-        if (value != null) {
-          let metadata = value.toObject()
-
-          if (metadata.isSet('text')) {
-            let text = metadata.get('text')
-
-            if (text != null) {
-              proposal.text = text.toString()
-            }
-          }
-        }
-      } else {
-        log.warning('Failed to parse JSON metadata, hash: {}, raw_data: {}', [hash, content.toHexString()])
-      }
-    } else {
-      log.warning('Metadata failed to load from IPFS, hash: {}', [hash])
-    }
-  }
+  // TODO: enable again when IPFS supported on Subgraph Studio
+  // if (event.params.metadata.startsWith('ipfs:')) {
+  //   let hash = event.params.metadata.slice(5) // because string.replace() is not supported on current AS version
+  //   let content = ipfs.cat(hash)
+  //
+  //   if (content != null) {
+  //     let jsonFile = json.try_fromBytes(content as Bytes)
+  //
+  //     if (jsonFile.isOk) {
+  //       let value = jsonFile.value
+  //
+  //       if (value != null) {
+  //         let metadata = value.toObject()
+  //
+  //         if (metadata.isSet('text')) {
+  //           let text = metadata.get('text')
+  //
+  //           if (text != null) {
+  //             proposal.text = text.toString()
+  //           }
+  //         }
+  //       }
+  //     } else {
+  //       log.warning('Failed to parse JSON metadata, hash: {}, raw_data: {}', [hash, content.toHexString()])
+  //     }
+  //   } else {
+  //     log.warning('Metadata failed to load from IPFS, hash: {}', [hash])
+  //   }
+  // }
 
   proposal.voteCount = integer.ZERO
   proposal.positiveVoteCount = proposalData.value6
