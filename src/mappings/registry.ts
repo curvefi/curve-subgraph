@@ -48,31 +48,6 @@ function getOrCreatePool(address: Address, event: ethereum.Event): Pool {
     // Pool name
     pool.name = registryContract.get_pool_name(address)
 
-    // Reference asset
-    let assetType = registryContract.try_get_pool_asset_type(address)
-
-    if (!assetType.reverted) {
-      let type = assetType.value.toString()
-
-      if (type == '0') {
-        pool.assetType = 'USD'
-      } else if (type == '1') {
-        pool.assetType = 'ETH'
-      } else if (type == '2') {
-        pool.assetType = 'BTC'
-      } else if (type == '3') {
-        if (pool.name == 'link') {
-          pool.assetType = 'LINK'
-        } else if (pool.name.startsWith('eur')) {
-          pool.assetType = 'EUR'
-        } else {
-          pool.assetType = 'OTHER'
-        }
-      } else if (type == '4') {
-        pool.assetType = 'CRYPTO'
-      }
-    }
-
     // Coin balances and underlying coin balances/rates
     saveCoins(pool!, event)
 
