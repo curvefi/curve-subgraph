@@ -13,8 +13,8 @@
     "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 pioul/curve-subgraph"
   },
   "dependencies": {
-    "@graphprotocol/graph-cli": "0.20.1",
-    "@graphprotocol/graph-ts": "0.20.0",
+    "@graphprotocol/graph-cli": "0.21.0",
+    "@graphprotocol/graph-ts": "0.20.1",
     "@protofire/subgraph-toolkit": "0.1.2"
   }
 }
