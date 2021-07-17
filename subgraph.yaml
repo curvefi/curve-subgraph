@@ -157,28 +157,6 @@ dataSources:
         - event: PoolRemoved(indexed address)
           handler: handlePoolRemoved
 
-  # Contract used to deploy new metapools. It also acts a registry for finding the deployed pools and querying information about them.
-  - name: MetapoolFactory
-    kind: ethereum/contract
-    network: mainnet
-    source:
-      abi: Factory
-      address: '0x0959158b6040d32d04c301a72cbfd6b39e21c9ae'
-      startBlock: 11942404
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.4
-      language: wasm/assemblyscript
-      file: ./src/mappings/factory.ts
-      abis:
-        - name: Factory
-          file: ./abis/Factory.abi
-      entities:
-        - Pool
-      eventHandlers:
-        - event: MetaPoolDeployed(address,address,uint256,uint256,address)
-          handler: handleMetaPoolDeployed
-
   # Controls liquidity gauges and the issuance of CRV through the liquidity gauges
   - name: GaugeController
     kind: ethereum/contract
