@@ -66,7 +66,14 @@ export function handleNewGauge(event: NewGauge): void {
 
   let nextWeek = nextPeriod(event.block.timestamp, WEEK)
 
+  // Get or register gauge type
   let gaugeType = GaugeType.load(event.params.gauge_type.toString())!
+
+  if (gaugeType == null) {
+    gaugeType = new GaugeType(event.params.gauge_type.toString())
+    gaugeType.name = gaugeController.gauge_type_names(event.params.gauge_type)
+    gaugeType.save()
+  }
 
   // Add gauge instance
   let gauge = new Gauge(event.params.addr.toHexString())
