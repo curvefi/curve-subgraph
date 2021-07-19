@@ -1,5 +1,7 @@
-import { Address, ethereum } from '@graphprotocol/graph-ts'
+import { Address, dataSource, ethereum } from '@graphprotocol/graph-ts'
 import { decimal, integer } from '@protofire/subgraph-toolkit'
+
+import { Registry } from '../../generated/templates/Pool/Registry'
 
 import {
   AddLiquidity,
@@ -376,7 +378,44 @@ function getEventId(event: ethereum.Event): string {
 
 function getPoolSnapshot(pool: Pool, event: ethereum.Event): Pool {
   if (pool != null) {
-    let poolContract = StableSwap.bind(pool.swapAddress as Address)
+    let poolAddress = pool.swapAddress as Address
+    let poolContract = StableSwap.bind(poolAddress)
+
+    // Workaround needed because batch_set_pool_asset_type() doesn't emit events
+    // See https://etherscan.io/tx/0xf8e8d67ec16657ecc707614f733979d105e0b814aa698154c153ba9b44bf779b
+    if (event.block.number.toI32() >= 12667823) {
+      // Reference asset
+      if (pool.assetType == null) {
+        let context = dataSource.context()
+
+        let registryAddress = context.getBytes('registry') as Address
+        let registryContract = Registry.bind(registryAddress)
+
+        let assetType = registryContract.try_get_pool_asset_type(poolAddress)
+
+        if (!assetType.reverted) {
+          let type = assetType.value.toI32()
+
+          if (type == 0) {
+            pool.assetType = 'USD'
+          } else if (type == 1) {
+            pool.assetType = 'ETH'
+          } else if (type == 2) {
+            pool.assetType = 'BTC'
+          } else if (type == 3) {
+            if (pool.name == 'link') {
+              pool.assetType = 'LINK'
+            } else if (pool.name.startsWith('eur')) {
+              pool.assetType = 'EUR'
+            } else {
+              pool.assetType = 'OTHER'
+            }
+          } else if (type == 4) {
+            pool.assetType = 'CRYPTO'
+          }
+        }
+      }
+    }
 
     // Update coin balances and underlying coin balances/rates
     saveCoins(pool!, event)
