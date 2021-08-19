@@ -107,6 +107,7 @@ type GaugeWeightVote @entity {
 type GaugeType @entity {
   id: ID!
   name: String!
+  gaugeCount: BigInt!
   gauges: [Gauge!] @derivedFrom(field: "type")
   weights: [GaugeTypeWeight!] @derivedFrom(field: "type")
 }

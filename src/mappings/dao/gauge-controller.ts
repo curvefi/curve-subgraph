@@ -25,6 +25,7 @@ import {
 } from '../../../generated/schema'
 
 import { getOrRegisterAccount } from '../../services/accounts'
+import { getGaugeType, registerGaugeType } from '../../services/gauge-types'
 import { getSystemState } from '../../services/system-state'
 import { getOrCreateLpToken } from '../../services/tokens'
 
@@ -38,8 +39,7 @@ export function handleAddType(event: AddType): void {
   let nextWeek = nextPeriod(event.block.timestamp, WEEK)
 
   // Add gauge type
-  let gaugeType = new GaugeType(event.params.type_id.toString())
-  gaugeType.name = event.params.name
+  let gaugeType = registerGaugeType(event.params.type_id.toString(), event.params.name)
   gaugeType.save()
 
   // Save gauge type weight
@@ -67,13 +67,17 @@ export function handleNewGauge(event: NewGauge): void {
   let nextWeek = nextPeriod(event.block.timestamp, WEEK)
 
   // Get or register gauge type
-  let gaugeType = GaugeType.load(event.params.gauge_type.toString())!
+  let gaugeType = getGaugeType(event.params.gauge_type.toString())
 
   if (gaugeType == null) {
-    gaugeType = new GaugeType(event.params.gauge_type.toString())
-    gaugeType.name = gaugeController.gauge_type_names(event.params.gauge_type)
-    gaugeType.save()
+    gaugeType = registerGaugeType(
+      event.params.gauge_type.toString(),
+      gaugeController.gauge_type_names(event.params.gauge_type),
+    )
   }
+
+  gaugeType.gaugeCount = gaugeType.gaugeCount.plus(integer.ONE)
+  gaugeType.save()
 
   // Add gauge instance
   let gauge = new Gauge(event.params.addr.toHexString())
