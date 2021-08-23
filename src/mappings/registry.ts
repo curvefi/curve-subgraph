@@ -26,12 +26,12 @@ function getOrCreatePool(address: Address, event: ethereum.Event): Pool {
 
   if (pool == null) {
     let registryContract = Registry.bind(dataSource.address())
-    let swapContract = StableSwap.bind(address)
+    let poolContract = StableSwap.bind(address)
 
     let coinCount = registryContract.get_n_coins(address)
 
     pool = new Pool(address.toHexString())
-    pool.swapAddress = swapContract._address
+    pool.swapAddress = poolContract._address
     pool.registryAddress = registryContract._address
 
     // Counters
@@ -75,23 +75,31 @@ function getOrCreatePool(address: Address, event: ethereum.Event): Pool {
     }
 
     // Pool parameters
-    let params = registryContract.try_get_parameters(address)
+    let A = poolContract.try_A()
+    let adminFee = poolContract.try_admin_fee()
+    let fee = poolContract.try_fee()
 
-    if (!params.reverted) {
-      pool.A = params.value.value0
-      pool.fee = decimal.fromBigInt(params.value.value2, FEE_PRECISION)
-      pool.adminFee = decimal.fromBigInt(params.value.value3, FEE_PRECISION)
+    if (!A.reverted) {
+      pool.A = A.value
+    }
+
+    if (!fee.reverted) {
+      pool.fee = decimal.fromBigInt(fee.value, FEE_PRECISION)
+    }
+
+    if (!adminFee.reverted) {
+      pool.adminFee = decimal.fromBigInt(adminFee.value, FEE_PRECISION)
     }
 
     // Owner
-    let owner = swapContract.try_owner()
+    let owner = poolContract.try_owner()
 
     if (!owner.reverted) {
       pool.owner = owner.value
     }
 
     // Virtual price
-    let virtualPrice = swapContract.try_get_virtual_price()
+    let virtualPrice = poolContract.try_get_virtual_price()
 
     pool.virtualPrice = virtualPrice.reverted ? decimal.ZERO : decimal.fromBigInt(virtualPrice.value)
 
