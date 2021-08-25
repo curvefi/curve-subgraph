@@ -123,9 +123,7 @@ export function handleNewGauge(event: NewGauge): void {
   state.save()
 
   // Start indexing gauge events
-  if (gaugeType.name == 'Liquidity' || gaugeType.name.includes('Crypto Pools')) {
-    LiquidityGauge.create(event.params.addr)
-  }
+  LiquidityGauge.create(event.params.addr)
 }
 
 export function handleNewGaugeWeight(event: NewGaugeWeight): void {
