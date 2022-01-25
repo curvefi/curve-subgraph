@@ -6,7 +6,7 @@ import { SystemState } from '../../generated/schema'
 export function getSystemState(event: ethereum.Event): SystemState {
   let state = SystemState.load('current')
 
-  if (state == null) {
+  if (!state) {
     state = new SystemState('current')
     state.contractCount = integer.ZERO
     state.gaugeCount = integer.ZERO
@@ -21,5 +21,5 @@ export function getSystemState(event: ethereum.Event): SystemState {
   state.updatedAtBlock = event.block.number
   state.updatedAtTransaction = event.transaction.hash
 
-  return state!
+  return state
 }

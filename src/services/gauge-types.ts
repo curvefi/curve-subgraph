@@ -3,7 +3,7 @@ import { integer } from '@protofire/subgraph-toolkit'
 import { GaugeType } from '../../generated/schema'
 
 export function getGaugeType(id: string): GaugeType | null {
-  return GaugeType.load(id)!
+  return GaugeType.load(id)
 }
 
 export function registerGaugeType(id: string, name: string): GaugeType {

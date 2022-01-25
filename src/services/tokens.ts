@@ -14,7 +14,7 @@ class TokenInfo {
 export function getOrCreateToken(address: Address, event: ethereum.Event): Token {
   let token = Token.load(address.toHexString())
 
-  if (token == null) {
+  if (!token) {
     token = new Token(address.toHexString())
     token.address = address
 
@@ -38,13 +38,13 @@ export function getOrCreateToken(address: Address, event: ethereum.Event): Token
     state.save()
   }
 
-  return token!
+  return token
 }
 
 export function getOrCreateLpToken(address: Address): LpToken {
   let token = LpToken.load(address.toHexString())
 
-  if (token == null) {
+  if (!token) {
     let info = getTokenInfo(address)
 
     token = new LpToken(address.toHexString())
@@ -56,7 +56,7 @@ export function getOrCreateLpToken(address: Address): LpToken {
     token.save()
   }
 
-  return token!
+  return token
 }
 
 function getTokenInfo(address: Address): TokenInfo {

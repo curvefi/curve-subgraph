@@ -68,19 +68,19 @@ export function handleStartVote(event: StartVote): void {
   //   let hash = event.params.metadata.slice(5) // because string.replace() is not supported on current AS version
   //   let content = ipfs.cat(hash)
   //
-  //   if (content != null) {
+  //   if (content) {
   //     let jsonFile = json.try_fromBytes(content as Bytes)
   //
   //     if (jsonFile.isOk) {
   //       let value = jsonFile.value
   //
-  //       if (value != null) {
+  //       if (value) {
   //         let metadata = value.toObject()
   //
   //         if (metadata.isSet('text')) {
   //           let text = metadata.get('text')
   //
-  //           if (text != null) {
+  //           if (text) {
   //             proposal.text = text.toString()
   //           }
   //         }
@@ -116,7 +116,7 @@ export function handleStartVote(event: StartVote): void {
 export function handleCastVote(event: CastVote): void {
   let proposal = Proposal.load(event.address.toHexString() + '-' + event.params.voteId.toString())
 
-  if (proposal != null) {
+  if (proposal) {
     let voter = getOrRegisterAccount(event.params.voter)
 
     let vote = new ProposalVote(event.transaction.hash.toHexString() + '-' + event.logIndex.toString())
@@ -158,7 +158,7 @@ export function handleCastVote(event: CastVote): void {
 export function handleExecuteVote(event: ExecuteVote): void {
   let proposal = Proposal.load(event.address.toHexString() + '-' + event.params.voteId.toString())
 
-  if (proposal != null) {
+  if (proposal) {
     proposal.executed = event.block.timestamp
     proposal.executedAtBlock = event.block.number
     proposal.executedAtTransaction = event.transaction.hash
@@ -166,11 +166,11 @@ export function handleExecuteVote(event: ExecuteVote): void {
   }
 }
 
-function getOrRegisterVotingApp(address: Bytes): VotingApp {
+function getOrRegisterVotingApp(address: Address): VotingApp {
   let app = VotingApp.load(address.toHexString())
 
-  if (app == null) {
-    let votingContract = Voting.bind(address as Address)
+  if (!app) {
+    let votingContract = Voting.bind(address)
 
     let codename = dataSource
       .context()
@@ -191,5 +191,5 @@ function getOrRegisterVotingApp(address: Bytes): VotingApp {
     app.save()
   }
 
-  return app!
+  return app
 }
