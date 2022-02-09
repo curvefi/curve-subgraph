@@ -21,7 +21,7 @@ function registerContract(id: BigInt, event: ethereum.Event): Contract {
   let contract = Contract.load(id.toString())
   let state = getSystemState(event)
 
-  if (contract == null) {
+  if (!contract) {
     contract = new Contract(id.toString())
     contract.description = info.value4
     contract.added = event.block.timestamp
@@ -51,5 +51,5 @@ function registerContract(id: BigInt, event: ethereum.Event): Contract {
 
   state.save()
 
-  return contract!
+  return contract
 }

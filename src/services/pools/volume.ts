@@ -10,14 +10,14 @@ export function getHourlyTradeVolume(pool: Pool, timestamp: BigInt): HourlyVolum
 
   let volume = HourlyVolume.load(id)
 
-  if (volume == null) {
+  if (!volume) {
     volume = new HourlyVolume(id)
     volume.pool = pool.id
     volume.timestamp = hour
     volume.volume = decimal.ZERO
   }
 
-  return volume!
+  return volume
 }
 
 export function getDailyTradeVolume(pool: Pool, timestamp: BigInt): DailyVolume {
@@ -27,14 +27,14 @@ export function getDailyTradeVolume(pool: Pool, timestamp: BigInt): DailyVolume 
 
   let volume = DailyVolume.load(id)
 
-  if (volume == null) {
+  if (!volume) {
     volume = new DailyVolume(id)
     volume.pool = pool.id
     volume.timestamp = day
     volume.volume = decimal.ZERO
   }
 
-  return volume!
+  return volume
 }
 
 export function getWeeklyTradeVolume(pool: Pool, timestamp: BigInt): WeeklyVolume {
@@ -44,12 +44,12 @@ export function getWeeklyTradeVolume(pool: Pool, timestamp: BigInt): WeeklyVolum
 
   let volume = WeeklyVolume.load(id)
 
-  if (volume == null) {
+  if (!volume) {
     volume = new WeeklyVolume(id)
     volume.pool = pool.id
     volume.timestamp = week
     volume.volume = decimal.ZERO
   }
 
-  return volume!
+  return volume
 }

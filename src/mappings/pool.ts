@@ -1,4 +1,4 @@
-import { Address, dataSource, ethereum } from '@graphprotocol/graph-ts'
+import { Address, ByteArray, dataSource, ethereum } from '@graphprotocol/graph-ts'
 import { decimal, integer } from '@protofire/subgraph-toolkit'
 
 import { Registry } from '../../generated/templates/Pool/Registry'
@@ -38,12 +38,13 @@ import { saveCoins } from '../services/pools/coins'
 import { getDailyTradeVolume, getHourlyTradeVolume, getWeeklyTradeVolume } from '../services/pools/volume'
 
 import { FEE_PRECISION } from '../constants'
+import { address } from '../utils'
 
 export function handleAddLiquidity(event: AddLiquidity): void {
   let pool = Pool.load(event.address.toHexString())
 
-  if (pool != null) {
-    pool = getPoolSnapshot(pool!, event)
+  if (pool) {
+    pool = getPoolSnapshot(pool, event)
 
     let provider = getOrRegisterAccount(event.params.provider)
 
@@ -67,8 +68,8 @@ export function handleAddLiquidity(event: AddLiquidity): void {
 export function handleRemoveLiquidity(event: RemoveLiquidity): void {
   let pool = Pool.load(event.address.toHexString())
 
-  if (pool != null) {
-    pool = getPoolSnapshot(pool!, event)
+  if (pool) {
+    pool = getPoolSnapshot(pool, event)
 
     let provider = getOrRegisterAccount(event.params.provider)
 
@@ -91,8 +92,8 @@ export function handleRemoveLiquidity(event: RemoveLiquidity): void {
 export function handleRemoveLiquidityImbalance(event: RemoveLiquidityImbalance): void {
   let pool = Pool.load(event.address.toHexString())
 
-  if (pool != null) {
-    pool = getPoolSnapshot(pool!, event)
+  if (pool) {
+    pool = getPoolSnapshot(pool, event)
 
     let provider = getOrRegisterAccount(event.params.provider)
 
@@ -116,8 +117,8 @@ export function handleRemoveLiquidityImbalance(event: RemoveLiquidityImbalance):
 export function handleRemoveLiquidityOne(event: RemoveLiquidityOne): void {
   let pool = Pool.load(event.address.toHexString())
 
-  if (pool != null) {
-    pool = getPoolSnapshot(pool!, event)
+  if (pool) {
+    pool = getPoolSnapshot(pool, event)
 
     let provider = getOrRegisterAccount(event.params.provider)
 
@@ -139,8 +140,8 @@ export function handleRemoveLiquidityOne(event: RemoveLiquidityOne): void {
 export function handleTokenExchange(event: TokenExchange): void {
   let pool = Pool.load(event.address.toHexString())
 
-  if (pool != null) {
-    pool = getPoolSnapshot(pool!, event)
+  if (pool) {
+    pool = getPoolSnapshot(pool, event)
 
     let coinSold = Coin.load(pool.id + '-' + event.params.sold_id.toString())!
     let tokenSold = Token.load(coinSold.token)!
@@ -169,15 +170,15 @@ export function handleTokenExchange(event: TokenExchange): void {
     // Save trade volume
     let volume = exchange.amountSold.plus(exchange.amountBought).div(decimal.TWO)
 
-    let hourlyVolume = getHourlyTradeVolume(pool!, event.block.timestamp)
+    let hourlyVolume = getHourlyTradeVolume(pool, event.block.timestamp)
     hourlyVolume.volume = hourlyVolume.volume.plus(volume)
     hourlyVolume.save()
 
-    let dailyVolume = getDailyTradeVolume(pool!, event.block.timestamp)
+    let dailyVolume = getDailyTradeVolume(pool, event.block.timestamp)
     dailyVolume.volume = dailyVolume.volume.plus(volume)
     dailyVolume.save()
 
-    let weeklyVolume = getWeeklyTradeVolume(pool!, event.block.timestamp)
+    let weeklyVolume = getWeeklyTradeVolume(pool, event.block.timestamp)
     weeklyVolume.volume = weeklyVolume.volume.plus(volume)
     weeklyVolume.save()
 
@@ -189,8 +190,8 @@ export function handleTokenExchange(event: TokenExchange): void {
 export function handleTokenExchangeUnderlying(event: TokenExchangeUnderlying): void {
   let pool = Pool.load(event.address.toHexString())
 
-  if (pool != null) {
-    pool = getPoolSnapshot(pool!, event)
+  if (pool) {
+    pool = getPoolSnapshot(pool, event)
 
     let coinSold = UnderlyingCoin.load(pool.id + '-' + event.params.sold_id.toString())!
     let tokenSold = Token.load(coinSold.token)!
@@ -219,15 +220,15 @@ export function handleTokenExchangeUnderlying(event: TokenExchangeUnderlying): v
     // Save trade volume
     let volume = exchange.amountSold.plus(exchange.amountBought).div(decimal.TWO)
 
-    let hourlyVolume = getHourlyTradeVolume(pool!, event.block.timestamp)
+    let hourlyVolume = getHourlyTradeVolume(pool, event.block.timestamp)
     hourlyVolume.volume = hourlyVolume.volume.plus(volume)
     hourlyVolume.save()
 
-    let dailyVolume = getDailyTradeVolume(pool!, event.block.timestamp)
+    let dailyVolume = getDailyTradeVolume(pool, event.block.timestamp)
     dailyVolume.volume = dailyVolume.volume.plus(volume)
     dailyVolume.save()
 
-    let weeklyVolume = getWeeklyTradeVolume(pool!, event.block.timestamp)
+    let weeklyVolume = getWeeklyTradeVolume(pool, event.block.timestamp)
     weeklyVolume.volume = weeklyVolume.volume.plus(volume)
     weeklyVolume.save()
 
@@ -239,8 +240,8 @@ export function handleTokenExchangeUnderlying(event: TokenExchangeUnderlying): v
 export function handleNewAdmin(event: NewAdmin): void {
   let pool = Pool.load(event.address.toHexString())
 
-  if (pool != null) {
-    pool = getPoolSnapshot(pool!, event)
+  if (pool) {
+    pool = getPoolSnapshot(pool, event)
 
     // Save new owner
     pool.owner = event.params.admin
@@ -261,8 +262,8 @@ export function handleNewAdmin(event: NewAdmin): void {
 export function handleNewFee(event: NewFee): void {
   let pool = Pool.load(event.address.toHexString())
 
-  if (pool != null) {
-    pool = getPoolSnapshot(pool!, event)
+  if (pool) {
+    pool = getPoolSnapshot(pool, event)
 
     pool.adminFee = decimal.fromBigInt(event.params.admin_fee, FEE_PRECISION)
     pool.fee = decimal.fromBigInt(event.params.fee, FEE_PRECISION)
@@ -291,8 +292,8 @@ export function handleNewFee(event: NewFee): void {
 export function handleNewParameters(event: NewParameters): void {
   let pool = Pool.load(event.address.toHexString())
 
-  if (pool != null) {
-    pool = getPoolSnapshot(pool!, event)
+  if (pool) {
+    pool = getPoolSnapshot(pool, event)
 
     // Save pool parameters
     pool.A = event.params.A
@@ -331,8 +332,8 @@ export function handleNewParameters(event: NewParameters): void {
 export function handleRampA(event: RampA): void {
   let pool = Pool.load(event.address.toHexString())
 
-  if (pool != null) {
-    pool = getPoolSnapshot(pool!, event)
+  if (pool) {
+    pool = getPoolSnapshot(pool, event)
 
     // Save pool parameters
     pool.A = event.params.new_A
@@ -353,8 +354,8 @@ export function handleRampA(event: RampA): void {
 export function handleStopRampA(event: StopRampA): void {
   let pool = Pool.load(event.address.toHexString())
 
-  if (pool != null) {
-    pool = getPoolSnapshot(pool!, event)
+  if (pool) {
+    pool = getPoolSnapshot(pool, event)
 
     // Save pool parameters
     pool.A = event.params.A
@@ -377,18 +378,18 @@ function getEventId(event: ethereum.Event): string {
 }
 
 function getPoolSnapshot(pool: Pool, event: ethereum.Event): Pool {
-  if (pool != null) {
-    let poolAddress = pool.swapAddress as Address
+  if (pool) {
+    let poolAddress = address.fromBytes(pool.swapAddress)
     let poolContract = StableSwap.bind(poolAddress)
 
     // Workaround needed because batch_set_pool_asset_type() doesn't emit events
     // See https://etherscan.io/tx/0xf8e8d67ec16657ecc707614f733979d105e0b814aa698154c153ba9b44bf779b
     if (event.block.number.toI32() >= 12667823) {
       // Reference asset
-      if (pool.assetType == null) {
+      if (!pool.assetType) {
         let context = dataSource.context()
 
-        let registryAddress = context.getBytes('registry') as Address
+        let registryAddress = address.fromBytes(context.getBytes('registry'))
         let registryContract = Registry.bind(registryAddress)
 
         let assetType = registryContract.try_get_pool_asset_type(poolAddress)
@@ -418,7 +419,7 @@ function getPoolSnapshot(pool: Pool, event: ethereum.Event): Pool {
     }
 
     // Update coin balances and underlying coin balances/rates
-    saveCoins(pool!, event)
+    saveCoins(pool, event)
 
     // Save current virtual price
     let virtualPrice = poolContract.try_get_virtual_price()

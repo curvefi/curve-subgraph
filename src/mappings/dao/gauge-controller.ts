@@ -69,7 +69,7 @@ export function handleNewGauge(event: NewGauge): void {
   // Get or register gauge type
   let gaugeType = getGaugeType(event.params.gauge_type.toString())
 
-  if (gaugeType == null) {
+  if (!gaugeType) {
     gaugeType = registerGaugeType(
       event.params.gauge_type.toString(),
       gaugeController.gauge_type_names(event.params.gauge_type),
@@ -96,9 +96,12 @@ export function handleNewGauge(event: NewGauge): void {
     token.gauge = gauge.id
     token.save()
 
-    if (token.pool != null) {
-      let pool = Pool.load(token.pool)!
-      gauge.pool = pool.id
+    if (token.pool) {
+      let pool = Pool.load(token.pool!)
+
+      if (pool) {
+        gauge.pool = pool.id
+      }
     }
   }
 
@@ -129,7 +132,7 @@ export function handleNewGauge(event: NewGauge): void {
 export function handleNewGaugeWeight(event: NewGaugeWeight): void {
   let gauge = Gauge.load(event.params.gauge_address.toHexString())
 
-  if (gauge != null) {
+  if (gauge) {
     let gaugeController = GaugeController.bind(event.address)
 
     let nextWeek = nextPeriod(event.params.time, WEEK)
@@ -152,7 +155,7 @@ export function handleNewGaugeWeight(event: NewGaugeWeight): void {
 export function handleNewTypeWeight(event: NewTypeWeight): void {
   let gaugeType = GaugeType.load(event.params.type_id.toString())
 
-  if (gaugeType != null) {
+  if (gaugeType) {
     let typeWeight = new GaugeTypeWeight(gaugeType.id + '-' + event.params.time.toString())
     typeWeight.type = gaugeType.id
     typeWeight.time = event.params.time
@@ -169,7 +172,7 @@ export function handleNewTypeWeight(event: NewTypeWeight): void {
 export function handleVoteForGauge(event: VoteForGauge): void {
   let gauge = Gauge.load(event.params.gauge_addr.toHexString())
 
-  if (gauge != null) {
+  if (gauge) {
     let gaugeController = GaugeController.bind(event.address)
 
     let nextWeek = nextPeriod(event.params.time, WEEK)

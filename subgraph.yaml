@@ -14,7 +14,7 @@ templates:
       abi: StableSwap
     mapping: &pool_mapping
       kind: ethereum/events
-      apiVersion: 0.0.4
+      apiVersion: 0.0.5
       language: wasm/assemblyscript
       file: ./src/mappings/pool.ts
       entities: [ ]
@@ -55,7 +55,7 @@ templates:
       abi: LiquidityGauge
     mapping: &liquidity_gauge_mapping
       kind: ethereum/events
-      apiVersion: 0.0.4
+      apiVersion: 0.0.5
       language: wasm/assemblyscript
       file: ./src/mappings/dao/gauge.ts
       entities: [ ]
@@ -78,7 +78,7 @@ templates:
       abi: Voting
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.4
+      apiVersion: 0.0.5
       language: wasm/assemblyscript
       file: ./src/mappings/dao/voting.ts
       entities: [ ]
@@ -112,7 +112,7 @@ dataSources:
       startBlock: 11153725
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.4
+      apiVersion: 0.0.5
       language: wasm/assemblyscript
       file: ./src/mappings/address-provider.ts
       abis:
@@ -138,7 +138,7 @@ dataSources:
       startBlock: 12195750
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.4
+      apiVersion: 0.0.5
       language: wasm/assemblyscript
       file: ./src/mappings/registry.ts
       entities: [ ]
@@ -167,7 +167,7 @@ dataSources:
       startBlock: 10647875
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.4
+      apiVersion: 0.0.5
       language: wasm/assemblyscript
       file: ./src/mappings/dao/gauge-controller.ts
       abis:
@@ -205,7 +205,7 @@ dataSources:
       startBlock: 10647740
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.4
+      apiVersion: 0.0.5
       language: wasm/assemblyscript
       file: ./src/mappings/dao/kernel.ts
       abis:
