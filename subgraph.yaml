@@ -26,6 +26,8 @@ templates:
       eventHandlers:
         - event: AddLiquidity(indexed address,uint256[2],uint256[2],uint256,uint256)
           handler: handleAddLiquidity
+        - event: AddLiquidity(indexed address,uint256[3],uint256[3],uint256,uint256)
+          handler: handleAddLiquidity
         - event: NewAdmin(indexed address)
           handler: handleNewAdmin
         - event: NewParameters(uint256,uint256,uint256)
@@ -38,7 +40,11 @@ templates:
           handler: handleStopRampA
         - event: RemoveLiquidity(indexed address,uint256[2],uint256[2],uint256)
           handler: handleRemoveLiquidity
+        - event: RemoveLiquidity(indexed address,uint256[3],uint256[3],uint256)
+          handler: handleRemoveLiquidity
         - event: RemoveLiquidityImbalance(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleRemoveLiquidityImbalance
+        - event: RemoveLiquidityImbalance(indexed address,uint256[3],uint256[3],uint256,uint256)
           handler: handleRemoveLiquidityImbalance
         - event: RemoveLiquidityOne(indexed address,uint256,uint256)
           handler: handleRemoveLiquidityOne

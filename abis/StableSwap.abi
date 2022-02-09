@@ -96,6 +96,38 @@
     "type": "event"
   },
   {
+    "name": "AddLiquidity",
+    "inputs": [
+      {
+        "type": "address",
+        "name": "provider",
+        "indexed": true
+      },
+      {
+        "type": "uint256[3]",
+        "name": "token_amounts",
+        "indexed": false
+      },
+      {
+        "type": "uint256[3]",
+        "name": "fees",
+        "indexed": false
+      },
+      {
+        "type": "uint256",
+        "name": "invariant",
+        "indexed": false
+      },
+      {
+        "type": "uint256",
+        "name": "token_supply",
+        "indexed": false
+      }
+    ],
+    "anonymous": false,
+    "type": "event"
+  },
+  {
     "name": "RemoveLiquidity",
     "inputs": [
       {
@@ -110,6 +142,33 @@
       },
       {
         "type": "uint256[2]",
+        "name": "fees",
+        "indexed": false
+      },
+      {
+        "type": "uint256",
+        "name": "token_supply",
+        "indexed": false
+      }
+    ],
+    "anonymous": false,
+    "type": "event"
+  },
+  {
+    "name": "RemoveLiquidity",
+    "inputs": [
+      {
+        "type": "address",
+        "name": "provider",
+        "indexed": true
+      },
+      {
+        "type": "uint256[3]",
+        "name": "token_amounts",
+        "indexed": false
+      },
+      {
+        "type": "uint256[3]",
         "name": "fees",
         "indexed": false
       },
@@ -159,6 +218,38 @@
       },
       {
         "type": "uint256[2]",
+        "name": "fees",
+        "indexed": false
+      },
+      {
+        "type": "uint256",
+        "name": "invariant",
+        "indexed": false
+      },
+      {
+        "type": "uint256",
+        "name": "token_supply",
+        "indexed": false
+      }
+    ],
+    "anonymous": false,
+    "type": "event"
+  },
+  {
+    "name": "RemoveLiquidityImbalance",
+    "inputs": [
+      {
+        "type": "address",
+        "name": "provider",
+        "indexed": true
+      },
+      {
+        "type": "uint256[3]",
+        "name": "token_amounts",
+        "indexed": false
+      },
+      {
+        "type": "uint256[3]",
         "name": "fees",
         "indexed": false
       },
